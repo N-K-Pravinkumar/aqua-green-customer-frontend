@@ -298,7 +298,7 @@ export const uploadAPI = {
     formData.append('file', file);
     formData.append('folder', folder);
     const token = localStorage.getItem('aga_token');
-    const response = await fetch('http://localhost:8080/api/upload/image', {
+    const response = await fetch('${API_ROOT}/api/upload/image', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` },
       body: formData,
