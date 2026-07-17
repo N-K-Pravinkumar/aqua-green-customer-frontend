@@ -860,7 +860,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Brand Marquee */}
+      {/* Brand Marquee
       <section style={{ padding: '48px 0', background: '#fff', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', overflow: 'hidden' }}>
         <div className="reveal" style={{ textAlign: 'center', marginBottom: 24 }}>
           <p style={{ fontSize: 11, fontWeight: 700, color: '#94A3B8', letterSpacing: '.2em', textTransform: 'uppercase' }}>Authorised Dealer For</p>
@@ -875,7 +875,7 @@ export default function HomePage() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Featured Products */}
       <FeaturedProducts onEnquire={openEnquire} />
