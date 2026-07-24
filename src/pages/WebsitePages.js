@@ -860,7 +860,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Brand Marquee
+      {/* Brand Marquee */}
       <section style={{ padding: '48px 0', background: '#fff', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', overflow: 'hidden' }}>
         <div className="reveal" style={{ textAlign: 'center', marginBottom: 24 }}>
           <p style={{ fontSize: 11, fontWeight: 700, color: '#94A3B8', letterSpacing: '.2em', textTransform: 'uppercase' }}>Authorised Dealer For</p>
@@ -875,7 +875,7 @@ export default function HomePage() {
             ))}
           </div>
         </div>
-      </section> */}
+      </section>
 
       {/* Featured Products */}
       <FeaturedProducts onEnquire={openEnquire} />
@@ -1023,7 +1023,7 @@ export function ProductsPage() {
 // ══════════════════════════════════════════════════════════════
 // SERVICES PAGE
 // ══════════════════════════════════════════════════════════════
-const SERVICES_DATA = [
+const SERVICES_FALLBACK = [
   { icon: Wrench,       title: 'Installation',           desc: 'Expert installation of all water purifier brands at your doorstep with same-day service.', gradient: 'linear-gradient(135deg,#0F9D58,#0d7a5c)', price: 'Starting ₹499' },
   { icon: RefreshCw,    title: 'Repair & Maintenance',   desc: 'Fast diagnosis and repair for all types of water purifier faults and issues.', gradient: 'linear-gradient(135deg,#065F46,#065F46)', price: 'Starting ₹299' },
   { icon: CalendarCheck,title: 'Annual Service',         desc: 'Comprehensive Annual Service with scheduled preventive maintenance visits.', gradient: 'linear-gradient(135deg,#0F9D58,#065F46)', price: 'Starting ₹999/yr' },
@@ -1031,6 +1031,26 @@ const SERVICES_DATA = [
   { icon: FlaskConical, title: 'Water Quality Testing',  desc: 'Free water quality testing to recommend the right purification system.', gradient: 'linear-gradient(135deg,#065F46,#0F9D58)', price: 'FREE' },
   { icon: Package,      title: 'Spare Parts Supply',     desc: 'Original spare parts for all major brands at the most competitive prices.', gradient: 'linear-gradient(135deg,#0F9D58,#065F46)', price: 'Market Best Price' },
 ];
+const SERVICE_GRADIENTS = [
+  'linear-gradient(135deg,#0F9D58,#0d7a5c)', 'linear-gradient(135deg,#065F46,#065F46)',
+  'linear-gradient(135deg,#0F9D58,#065F46)', 'linear-gradient(135deg,#0d7a5c,#0F9D58)',
+  'linear-gradient(135deg,#065F46,#0F9D58)', 'linear-gradient(135deg,#0F9D58,#065F46)',
+];
+function iconForService(name = '') {
+  const n = name.toLowerCase();
+  if (n.includes('install')) return Wrench;
+  if (n.includes('repair') || n.includes('maint')) return RefreshCw;
+  if (n.includes('annual') || n.includes('amc')) return CalendarCheck;
+  if (n.includes('filter') || n.includes('membrane')) return Filter;
+  if (n.includes('test') || n.includes('quality')) return FlaskConical;
+  if (n.includes('spare') || n.includes('part')) return Package;
+  return Wrench;
+}
+function priceLabelForService(s) {
+  if (s.pricingMode === 'FREE') return 'FREE';
+  if (s.pricingMode === 'ENQUIRE' || !s.price) return 'Enquire for Price';
+  return `Starting ₹${Number(s.price).toLocaleString('en-IN')}`;
+}
 
 const PROCESS_STEPS = [
   { num: '01', title: 'Book Service', desc: 'Call, WhatsApp, or fill our online form to schedule a visit.' },
@@ -1051,7 +1071,18 @@ const FAQS = [
 export function ServicesPage() {
   const [enquireOpen, setEnquireOpen] = useState(false);
   const [faqOpen, setFaqOpen] = useState(null);
+  const [services, setServices] = useState(null); // null = loading, [] = loaded-empty
   useReveal();
+
+  useEffect(() => {
+    serviceAPI.getAll()
+      .then(r => setServices(r.data.data || []))
+      .catch(() => setServices([]));
+  }, []);
+
+  const displayServices = (services && services.length > 0)
+    ? services.map(s => ({ icon: iconForService(s.name), title: s.name, desc: s.description, price: priceLabelForService(s) }))
+    : SERVICES_FALLBACK;
 
   return (
     <PageShell onEnquire={() => setEnquireOpen(true)}>
@@ -1072,8 +1103,8 @@ export function ServicesPage() {
       <section style={{ padding: '56px 0', background: '#F8FAFC' }}>
         <div className="site-max">
           <div className="services-grid">
-            {SERVICES_DATA.map((s, i) => (
-              <div key={s.title} className="service-card reveal" style={{ background: s.gradient, transitionDelay: `${i * 0.08}s` }}>
+            {displayServices.map((s, i) => (
+              <div key={s.title} className="service-card reveal" style={{ background: SERVICE_GRADIENTS[i % SERVICE_GRADIENTS.length], transitionDelay: `${i * 0.08}s` }}>
                 <div className="service-card-icon"><s.icon size={24} color="#fff" /></div>
                 <div className="service-card-title poppins">{s.title}</div>
                 <div className="service-card-desc">{s.desc}</div>
